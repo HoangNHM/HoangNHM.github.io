@@ -1,16 +1,5 @@
-<head><title>JavaScript Loan Calculator</title></head>
+<head><title>Tĩnh lãi bank</title></head>
 <body bgcolor="white">
-<!-- 
-  This is an HTML form that allows the user to enter data and allows
-  JavaScript to display the results it computes back to the user. The
-  form elements are embedded in a table to improve their appearance.
-  The form itself is given the name "loandata", and the fields within
-  the form are given names such as "r" and "years". These
-  field names are used in the JavaScript code that follows the form.
-  Note that some of the form elements define "onchange" or "onclick"
-  event handlers. These specify strings of JavaScript code to be
-  executed when the user enters data or clicks on a button. 
--->
 <form name="laidon">
   <table>
     <tr><td colspan="3"><b>Lãi đơn</b></td></tr>
@@ -207,18 +196,8 @@
   </table>
 </form>
 
-<!--
-  This is the JavaScript program that makes the example work. Note that
-  this script defines the calculate() function called by the event
-  handlers in the form. The function refers to values in the form
-  fields using the names defined in the HTML code above.
--->
 <script language="JavaScript">
 function calculate_laidon() {
-    // Get the user's input from the form. Assume it is all valid.
-    // Convert r from a percentage to a decimal, and convert from
-    // an annual rate to a monthly rate. Convert payment n in years
-    // to the number of monthly payments.
     var dock = document.laidon;
     var A = dock.A.value;
     var r = dock.r.value / 100;
@@ -238,10 +217,6 @@ function calculate_laidon() {
 }
 
 function calculate_laikep() {
-    // Get the user's input from the form. Assume it is all valid.
-    // Convert r from a percentage to a decimal, and convert from
-    // an annual rate to a monthly rate. Convert payment n in years
-    // to the number of monthly payments.
     var dock = document.laikep;
     var A = dock.A.value;
     var r = dock.r.value / 100;
@@ -261,10 +236,6 @@ function calculate_laikep() {
 }
 
 function calculate_guihangthang() {
-    // Get the user's input from the form. Assume it is all valid.
-    // Convert r from a percentage to a decimal, and convert from
-    // an annual rate to a monthly rate. Convert payment n in years
-    // to the number of monthly payments.
     var dock = document.guihangthang;
     var A = dock.A.value;
     var r = dock.r.value / 100;
@@ -272,7 +243,7 @@ function calculate_guihangthang() {
 
     // Check that the result is a finite number. If so, display the results.
     if (!isNaN(r)) {
-      var total = A*Math.pow(1+r, n)*r/(Math.pow(1+r, n)-1);
+      var total = round((A/r)*(Math.pow(1+r,n)-1)*(1+r));
       dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
       dock.difference.value = round(total - A*n).toLocaleString('vi', {style : 'currency', currency : 'VND'});
     }
