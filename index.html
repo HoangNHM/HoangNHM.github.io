@@ -3,7 +3,7 @@
 <script src="jquery-3.5.1.min.js"></script>
 <script type="text/javascript" src="calendar.js"></script>
 <link href="pfs-loan-repayment-calculator.css" rel="stylesheet" type="text/css" />
-<link href="calendar.css" rel="stylesheet" type="text/css" />
+<link href="src/css/calendar.css" rel="stylesheet" type="text/css" />
 </head>
 <body bgcolor="white">
 <script type="text/javascript">
@@ -19,13 +19,19 @@
   
 			// thousand separator & number only
 				
-			$('.txt-loan-repayment').keyup(function(){
+			$('.number-only').keyup(function(){
 				
 				this.value = this.value.replace(/[^0-9\.]/g,''); // number only
 		
 			});
 			
 			$("#money").keyup(function(){
+				var str = $(this).val();
+				str = str.replace(/\D+/g, '');
+				$(this).val(str.replace(/\d(?=(?:\d{3})+(?!\d))/g, '$&,'));
+			});
+			
+			$(".money-only").keyup(function(){
 				var str = $(this).val();
 				str = str.replace(/\D+/g, '');
 				$(this).val(str.replace(/\d(?=(?:\d{3})+(?!\d))/g, '$&,'));
@@ -159,15 +165,16 @@ function calcLoan()
 
 function calculate_laidon() {
     var dock = document.laidon;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var n = dock.n.value;
+	
+    var A = parseInt(dock.A.value.replace(/\,/g,''));
+    var r = parseFloat(dock.r.value) / 100;
+    var n = parseInt(dock.n.value);
 
     // Check that the result is a finite number. If so, display the results.
     if (!isNaN(r)) {
       var total = round(A*(1+n*r));
-      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
-      dock.difference.value = round(total - A).toLocaleString('vi', {style : 'currency', currency : 'VND'});
+      dock.total.value = converNumber(total);
+      dock.difference.value = converNumber(round(total - A));
     }
     // Otherwise, the user's input was probably invalid, so don't
     // display anything.
@@ -178,15 +185,16 @@ function calculate_laidon() {
 
 function calculate_laikep() {
     var dock = document.laikep;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var n = dock.n.value;
+    
+    var A = parseInt(dock.A.value.replace(/\,/g,''));
+    var r = parseFloat(dock.r.value) / 100;
+    var n = parseInt(dock.n.value);
 
     // Check that the result is a finite number. If so, display the results.
     if (!isNaN(r)) {
       var total = round(A*Math.pow((1+r), n));
-      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
-      dock.difference.value = round(total - A).toLocaleString('vi', {style : 'currency', currency : 'VND'});
+      dock.total.value = converNumber(total);
+      dock.difference.value = converNumber(round(total - A));
     }
     // Otherwise, the user's input was probably invalid, so don't
     // display anything.
@@ -197,15 +205,16 @@ function calculate_laikep() {
 
 function calculate_guihangthang() {
     var dock = document.guihangthang;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var n = dock.n.value;
+    
+    var A = parseInt(dock.A.value.replace(/\,/g,''));
+    var r = parseFloat(dock.r.value) / 100;
+    var n = parseInt(dock.n.value);
 
     // Check that the result is a finite number. If so, display the results.
     if (!isNaN(r)) {
       var total = round((A/r)*(Math.pow(1+r,n)-1)*(1+r));
-      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
-      dock.difference.value = round(total - A*n).toLocaleString('vi', {style : 'currency', currency : 'VND'});
+      dock.total.value = converNumber(total);
+      dock.difference.value = converNumber(round(total - A*n));
     }
     // Otherwise, the user's input was probably invalid, so don't
     // display anything.
@@ -216,16 +225,17 @@ function calculate_guihangthang() {
 
 function calculate_guiruthangthang() {
     var dock = document.guiruthangthang;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var X = dock.X.value;
-    var n = dock.n.value;
+	
+    var A = parseInt(dock.A.value.replace(/\,/g,''));
+    var X = parseInt(dock.X.value.replace(/\,/g,''));
+    var r = parseFloat(dock.r.value) / 100;
+    var n = parseInt(dock.n.value);
 
     // Check that the result is a finite number. If so, display the results.
     if (!isNaN(r)) {
       var total = round(A*Math.pow(1+r, n) - X*(Math.pow(1+r, n)-1)/r);
-      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
-      dock.difference.value = round(X*n).toLocaleString('vi', {style : 'currency', currency : 'VND'});
+      dock.total.value = converNumber(total);
+      dock.difference.value = converNumber(round(X*n));
     }
     // Otherwise, the user's input was probably invalid, so don't
     // display anything.
@@ -236,15 +246,16 @@ function calculate_guiruthangthang() {
 
 function calculate_guiruthangthangall() {
     var dock = document.guiruthangthangall;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var X = dock.X.value;
-    var n = dock.n.value;
+    
+    var A = parseInt(dock.A.value.replace(/\,/g,''));
+    var X = parseInt(dock.X.value.replace(/\,/g,''));
+    var r = parseFloat(dock.r.value) / 100;
+    var n = parseInt(dock.n.value);
 
     // Check that the result is a finite number. If so, display the results.
     if (!isNaN(r)) {
       var total = round(A*Math.pow(1+r, n)*r / (Math.pow(1+r, n)-1));
-      dock.X.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
+      dock.X.value = converNumber(total);
     }
     // Otherwise, the user's input was probably invalid, so don't
     // display anything.
@@ -255,13 +266,14 @@ function calculate_guiruthangthangall() {
 
 function calculate_vaytragop() {
     var dock = document.vaytragop;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var X = dock.X.value;
+    
+    var A = parseInt(dock.A.value.replace(/\,/g,''));
+    var X = parseInt(dock.X.value.replace(/\,/g,''));
+    var r = parseFloat(dock.r.value) / 100;
 
     // Check that the result is a finite number. If so, display the results.
     if (!isNaN(r)) {
-      dock.n.value = round((Math.log(X) - Math.log(X -A*r))/Math.log(1+r));
+      dock.n.value = converNumber(round((Math.log(X) - Math.log(X - A*r))/Math.log(1+r)));
     }
     // Otherwise, the user's input was probably invalid, so don't
     // display anything.
@@ -287,19 +299,19 @@ function round(x) {
 			<td align="left" width="20%">
 			<div class="text-loan-repayment">Số tiền vay</div>
 			</td>
-			<td align="left" width="80%"><input class="txt-loan-repayment" id="money" type="text" value="" tabindex="1"> VND</td>
+			<td align="left" width="80%"><input class="number-only" id="money" type="text" value="" tabindex="1"> VND</td>
 		</tr>
 		<tr>
 			<td align="left" width="20%">
 			<div class="text-loan-repayment">Thời gian vay</div>
 			</td>
-			<td align="left" width="80%"><input class="txt-loan-repayment" id="time" maxlength="3" type="text" value="" tabindex="2"> tháng</td>
+			<td align="left" width="80%"><input class="number-only" id="time" maxlength="3" type="text" value="" tabindex="2"> tháng</td>
 		</tr>
 		<tr>
 			<td align="left" width="20%">
 			<div class="text-loan-repayment">Lãi suất</div>
 			</td>
-			<td align="left" width="80%"><input class="txt-loan-repayment" id="percent" maxlength="4" type="text" value="" tabindex="3"> % năm</td>
+			<td align="left" width="80%"><input class="number-only" id="percent" maxlength="4" type="text" value="" tabindex="3"> % năm</td>
 		</tr>
 		<tr>
 			<td align="left" width="20%">
@@ -338,30 +350,27 @@ function round(x) {
     <tr><td colspan="3"><b>Lãi đơn</b></td></tr>
     <tr><img src="laidon.png" alt="lai don" width="100%"></tr>
     <tr>
-      <td>1)</td>
-      <td>A đồng</td>
-      <td><input type="number" name="A" size="12"></td>
+      <td>1) A đồng</td>
+      <td><input class="number-only money-only" type="text" value="" name="A"></td>
     </tr>
     <tr>
-      <td>2)</td>
-      <td>Lãi suất r%</td>
-      <td><input type="number" name="r" size="12"></td>
+      <td>2) Lãi suất r%</td>
+      <td><input class="number-only" type="text" value="" maxlength="4" name="r"></td>
     </tr>
     <tr>
-      <td>3)</td>
-      <td>Sau n kỳ hạn</td>
-      <td><input type="number" name="n" size="12""></td>
+      <td>3) Sau n kỳ hạn</td>
+      <td><input class="number-only" type="text" value="" maxlength="3" name="n"></td>
     </tr>
     <tr><td colspan="3">
       <input type="button" value="Compute" onclick="calculate_laidon();">
     </td></tr>
     <tr>
       <td>Số tiền cả gốc lẫn lãi sau n kỳ hạn</td>
-      <td><input type="text" name="total" size="12"></td>
+      <td><input type="text" readonly name="total"></td>
     </tr>
 	<tr>
       <td>Chênh lệch</td>
-      <td><input type="text" name="difference" size="12"></td>
+      <td><input type="text" readonly name="difference"></td>
     </tr>
   </table>
 </form>
@@ -371,30 +380,27 @@ function round(x) {
     <tr><td colspan="3"><b>Lãi kép</b></td></tr>
     <tr><img src="laikep.png" alt="lai kep" width="100%"></tr>
     <tr>
-      <td>1)</td>
-      <td>A đồng</td>
-      <td><input type="number" name="A" size="12"></td>
+      <td>1) A đồng</td>
+      <td><input class="number-only money-only" type="text" value="" name="A"></td>
     </tr>
     <tr>
-      <td>2)</td>
-      <td>Lãi suất r%</td>
-      <td><input type="number" name="r" size="12"></td>
+      <td>2) Lãi suất r%</td>
+      <td><input class="number-only" type="text" value="" maxlength="4" name="r"></td>
     </tr>
     <tr>
-      <td>3)</td>
-      <td>Sau n kỳ hạn</td>
-      <td><input type="number" name="n" size="12""></td>
+      <td>3) Sau n kỳ hạn</td>
+      <td><input class="number-only" type="text" value="" maxlength="3" name="n"></td>
     </tr>
     <tr><td colspan="3">
       <input type="button" value="Compute" onclick="calculate_laikep();">
     </td></tr>
     <tr>
       <td>Số tiền cả gốc lẫn lãi sau n kỳ hạn</td>
-      <td><input type="text" name="total" size="12"></td>
+      <td><input type="text" name="total" readonly></td>
     </tr>
 	<tr>
       <td>Chênh lệch</td>
-      <td><input type="text" name="difference" size="12"></td>
+      <td><input type="text" name="difference" readonly></td>
     </tr>
   </table>
 </form>
@@ -404,30 +410,27 @@ function round(x) {
     <tr><td colspan="3"><b>Tiền gửi hàng tháng</b></td></tr>
     <tr><img src="guihangthang.png" alt="gui hang thang" width="100%"></tr>
     <tr>
-      <td>1)</td>
-      <td>A đồng</td>
-      <td><input type="number" name="A" size="12"></td>
+      <td>1) A đồng</td>
+      <td><input class="number-only money-only" type="text" value="" name="A"></td>
     </tr>
     <tr>
-      <td>2)</td>
-      <td>Lãi suất r%</td>
-      <td><input type="number" name="r" size="12"></td>
+      <td>2) Lãi suất r%</td>
+      <td><input class="number-only" type="text" value="" maxlength="4" name="r"></td>
     </tr>
     <tr>
-      <td>3)</td>
-      <td>Sau n kỳ hạn</td>
-      <td><input type="number" name="n" size="12""></td>
+      <td>3) Sau n kỳ hạn</td>
+      <td><input class="number-only" type="text" value="" maxlength="3" name="n"></td>
     </tr>
     <tr><td colspan="3">
       <input type="button" value="Compute" onclick="calculate_guihangthang();">
     </td></tr>
     <tr>
       <td>Số tiền cả gốc lẫn lãi sau n kỳ hạn</td>
-      <td><input type="text" name="total" size="12"></td>
+      <td><input type="text" name="total" readonly></td>
     </tr>
 	<tr>
       <td>Chênh lệch</td>
-      <td><input type="text" name="difference" size="12"></td>
+      <td><input type="text" name="difference" readonly></td>
     </tr>
   </table>
 </form>
@@ -437,35 +440,31 @@ function round(x) {
     <tr><td colspan="3"><b>Tiền gửi hàng tháng</b></td></tr>
     <tr><img src="guiruthangthang.png" alt="gui rut hang thang" width="100%"></tr>
     <tr>
-      <td>1)</td>
-      <td>A đồng</td>
-      <td><input type="number" name="A" size="12"></td>
+      <td>1) A đồng</td>
+      <td><input class="number-only money-only" type="text" value="" name="A"></td>
     </tr>
     <tr>
-      <td>2)</td>
-      <td>Lãi suất r%</td>
-      <td><input type="number" name="r" size="12"></td>
+      <td>2) Lãi suất r%</td>
+      <td><input class="number-only" type="text" value="" maxlength="4" name="r"></td>
     </tr>
 	<tr>
-      <td>3)</td>
-      <td>Mỗi kỳ rút X</td>
-      <td><input type="number" name="X" size="12"></td>
+      <td>3) Mỗi kỳ rút X</td>
+      <td><input class="number-only money-only" type="text" value="" name="X"></td>
     </tr>
     <tr>
-      <td>4)</td>
-      <td>Sau n kỳ hạn</td>
-      <td><input type="number" name="n" size="12""></td>
+      <td>4) Sau n kỳ hạn</td>
+      <td><input class="number-only" type="text" value="" maxlength="3" name="n"></td>
     </tr>
     <tr><td colspan="3">
       <input type="button" value="Compute" onclick="calculate_guiruthangthang();">
     </td></tr>
     <tr>
       <td>Số tiền còn lại sau n kỳ hạn</td>
-      <td><input type="text" name="total" size="12"></td>
+      <td><input type="text" name="total" readonly></td>
     </tr>
 	<tr>
       <td>Đã rút</td>
-      <td><input type="text" name="difference" size="12"></td>
+      <td><input type="text" name="difference" readonly></td>
     </tr>
   </table>
 </form>
@@ -476,26 +475,23 @@ function round(x) {
     <tr><img src="guiruthangthangall.png" alt="gui rut hang thang all" width="100%"></tr>
     <tr><img src="guiruthangthangall_1.png" alt="gui rut hang thang all 1" width="100%"></tr>
     <tr>
-      <td>1)</td>
-      <td>A đồng</td>
-      <td><input type="number" name="A" size="12"></td>
+      <td>1) A đồng</td>
+      <td><input class="number-only money-only" type="text" value="" name="A"></td>
     </tr>
     <tr>
-      <td>2)</td>
-      <td>Lãi suất r%</td>
-      <td><input type="number" name="r" size="12"></td>
+      <td>2) Lãi suất r%</td>
+      <td><input class="number-only" type="text" value="" maxlength="4" name="r"></td>
     </tr>
     <tr>
-      <td>3)</td>
-      <td>Sau n kỳ hạn</td>
-      <td><input type="number" name="n" size="12""></td>
+      <td>3) Sau n kỳ hạn</td>
+      <td><input class="number-only" type="text" value="" maxlength="3" name="n"></td>
     </tr>
     <tr><td colspan="3">
       <input type="button" value="Compute" onclick="calculate_guiruthangthangall();">
     </td></tr>
     <tr>
       <td>Số tiền X rút mỗi kỳ</td>
-      <td><input type="text" name="X" size="12"></td>
+      <td><input type="text" name="X" readonly></td>
     </tr>
   </table>
 </form>
@@ -505,26 +501,23 @@ function round(x) {
     <tr><td colspan="3"><b>Vay trả góp</b></td></tr>
     <tr><img src="vaytragop.png" alt="vay tra gop" width="100%"></tr>
     <tr>
-      <td>1)</td>
-      <td>A đồng</td>
-      <td><input type="number" name="A" size="12"></td>
+      <td>1) A đồng</td>
+      <td><input class="number-only money-only" type="text" value="" name="A"></td>
     </tr>
     <tr>
-      <td>2)</td>
-      <td>Lãi suất r%</td>
-      <td><input type="number" name="r" size="12"></td>
+      <td>2) Lãi suất r%</td>
+      <td><input class="number-only" type="text" value="" maxlength="4" name="r"></td>
     </tr>
     <tr>
-      <td>3)</td>
-      <td>Mỗi kỳ rút X</td>
-      <td><input type="number" name="X" size="12"></td>
+      <td>3) Mỗi kỳ rút X</td>
+      <td><input class="number-only money-only" type="text" value="" name="X"></td>
     </tr>
     <tr><td colspan="3">
       <input type="button" value="Compute" onclick="calculate_vaytragop();">
     </td></tr>
     <tr>
       <td>Số n kỳ trả hết nợ</td>
-      <td><input type="text" name="n" size="12"></td>
+      <td><input type="text" name="n" readonly></td>
     </tr>
   </table>
 </form>
