@@ -1,0 +1,79 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.pfs-loan-repayment h1 
+{
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.pfs-loan-repayment .tbl-loan-repayment
+{
+    border: 1px solid #E2E2E2;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.tbl-loan-repayment td 
+{
+    line-height: 140%;
+    padding: 7px 6px;
+}
+
+.tbl-loan-repayment td .text-loan-repayment
+{
+	padding-left: 20px;
+}
+
+.pfs-loan-repayment .txt-loan-repayment, .pfs-loan-repayment .txt-date
+{
+	border: 1px solid #DBDBDB;
+    height: 25px;
+    line-height: 25px;
+	margin-right: 3px;
+    padding: 0 3px;
+    width: 200px;
+	text-align: right;
+}
+
+.pfs-loan-repayment .btnrepayment
+{
+	background: url("../images/btn-loan-repayment.png") no-repeat scroll 0 0;
+    border: medium none;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    height: 29px;
+    width: 84px;
+}
+
+.pfs-loan-repayment .tbl-list-repayment
+{
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.pfs-loan-repayment .tbl-list-repayment th 
+{
+    background: none repeat scroll 0 0 #ECECEC;
+    color: #303030;
+    font-size: 14px;
+    padding: 7px 5px;
+}
+
+.pfs-loan-repayment .tbl-list-repayment td 
+{
+    font-size: 14px;
+    line-height: 140%;
+    padding: 7px 6px;
+}
+
+#btnDate
+{
+	position: relative;
+	top: 2px;
+	cursor: pointer;
+}

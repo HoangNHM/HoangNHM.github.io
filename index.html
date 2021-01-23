@@ -1,5 +1,338 @@
-<head><title>Tĩnh lãi bank</title></head>
+<html>
+<head><title>Tĩnh lãi bank</title>
+<script src="jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="calendar.js"></script>
+<link href="pfs-loan-repayment-calculator.css" rel="stylesheet" type="text/css" />
+<link href="calendar.css" rel="stylesheet" type="text/css" />
+</head>
 <body bgcolor="white">
+<script type="text/javascript">
+
+	$(document).ready(function() {
+	
+	$("#btn-dunogiamdan").click(function(){
+    $(".pfs-loan-repayment").toggle();
+  });
+	$("#btn-laisuatcoban").click(function(){
+    $("#div-laisuatcoban").toggle();
+  });
+  
+			// thousand separator & number only
+				
+			$('.txt-loan-repayment').keyup(function(){
+				
+				this.value = this.value.replace(/[^0-9\.]/g,''); // number only
+		
+			});
+			
+			$("#money").keyup(function(){
+				var str = $(this).val();
+				str = str.replace(/\D+/g, '');
+				$(this).val(str.replace(/\d(?=(?:\d{3})+(?!\d))/g, '$&,'));
+			});
+			
+
+        });
+
+function converNumber(number)
+{
+	var strNumber="";
+	strNumber= String(number);
+	return strNumber.replace(/\d(?=(?:\d{3})+(?!\d))/g, '$&,')
+}
+
+
+function calcLoan()
+{
+	var summoney=0, time=0, percent=0, date, tmpDate;
+	var goc=0, lai=0,goc_lai=0, sum_goc=0,sum_lai=0, tempGoc;
+	var day,month,year;
+	
+	// check field
+	if($("#money").val()=="")
+	{
+		alert("Số tiền không được rỗng");
+		$("#money").focus();
+		return;
+	}
+	if($("#time").val()=="")
+	{
+		alert("Thời gian không được rỗng");
+		$("#time").focus();
+		return;
+	}
+	if($("#percent").val()=="")
+	{
+		alert("Lãi suất không được rỗng");
+		$("#percent").focus();
+		return;
+	}
+	
+	summoney=parseInt($("#money").val().replace(/\,/g,'')); // remove ,
+	time=parseInt($("#time").val());
+	percent=parseFloat($("#percent").val());
+	date=$("#date").val();
+	
+	
+	var d=new Date(date);
+	
+	day=d.getDate();
+	month=d.getMonth() + 1;
+	year=d.getFullYear();
+	var strDate= day +"/" + ( (month<10)? "0" + month:month )  + "/" + year;
+	
+	
+	tempGoc=summoney;
+
+	
+	var strResult="";
+	strResult="<table class=\"tbl-list-repayment\"  cellpadding=\"0\" cellspacing=\"0\" border=\"1\" bordercolor=\"#e2e2e2\" bgcolor=\"#fafafa\">"
+	
+	strResult +="<tr>"
+				+	"<th width=\"20%\" align=\"center\" colspan=\"2\">Kỳ trả nợ</th>"
+				+	"<th width=\"20%\" align=\"center\">Số gốc còn lại</th>"
+				+	"<th width=\"20%\" align=\"center\">Gốc</th>"
+				+	"<th width=\"20%\" align=\"center\">Lãi</th>"
+				+	"<th width=\"20%\" align=\"center\">Tổng gốc + Lãi</th>"
+				+"</tr>";
+	
+	strResult +="<tr>"
+				+	"<td width=\"15%\" align=\"center\">"+ strDate +"</td>"
+				+	"<td width=\"5%\" align=\"center\">0</td>"
+				+	"<td width=\"20%\" align=\"center\">"+ converNumber(summoney) +"</td>"
+				+	"<td width=\"20%\" align=\"center\"></td>"
+				+	"<td width=\"20%\" align=\"center\"></td>"
+				+	"<td width=\"20%\" align=\"center\"></td>"
+				+"</tr>";
+	
+	goc= parseInt(summoney)/time;				// tính gốc
+//	lai= parseInt(summoney) /12 * percent / 100; // tính lãi
+	
+	
+					
+	for(var i=0;i<time;i++)
+	{
+		sum_goc= sum_goc +goc;
+		
+		lai= parseInt(tempGoc) /12 * percent / 100; // tính lãi
+		
+		tempGoc= tempGoc-goc; // gốc còn lại theo từng tháng
+		goc_lai=goc+lai;
+		sum_lai= sum_lai + lai;
+		
+		// cộng ngày tháng
+		if(month==12)
+		{
+			month=1;
+			year=year+1;
+		}
+		else
+		{
+			month=month+1;
+		}
+		strDate= day +"/" +( (month<10)? "0" + month:month ) + "/" + year;
+		
+		strResult +="<tr>"
+				+	"<td width=\"15%\" align=\"center\">"+ strDate +"</td>"
+				+	"<td width=\"5%\" align=\"center\">" + (i+1) + "</td>"
+				+	"<td width=\"20%\" align=\"center\">"+converNumber(Math.round(tempGoc)) +"</td>"
+				+	"<td width=\"20%\" align=\"center\">"+ converNumber(Math.round(goc)) +"</td>"
+				+	"<td width=\"20%\" align=\"center\">"+converNumber(Math.round(lai)) + "</td>"
+				+	"<td width=\"20%\" align=\"center\">"+ converNumber(Math.round(goc_lai)) +"</td>"
+				+"</tr>"
+	}
+	
+	strResult +="<tr>"
+				+	"<th width=\"15%\" align=\"center\">Tổng</th>"
+				+	"<th width=\"5%\" align=\"center\"></th>"
+				+	"<th width=\"20%\" align=\"center\"></th>"
+				+	"<th width=\"20%\" align=\"center\">"+ converNumber(Math.round(sum_goc)) +"</th>"
+				+	"<th width=\"20%\" align=\"center\">"+converNumber(Math.round(sum_lai)) + "</th>"
+				+	"<th width=\"20%\" align=\"center\">"+ converNumber(Math.round(sum_goc + sum_lai)) +"</th>"
+				+"</tr>"
+	
+	strResult +="</table>";
+	
+	
+	document.getElementById("listRepayment").innerHTML=strResult;
+}
+
+function calculate_laidon() {
+    var dock = document.laidon;
+    var A = dock.A.value;
+    var r = dock.r.value / 100;
+    var n = dock.n.value;
+
+    // Check that the result is a finite number. If so, display the results.
+    if (!isNaN(r)) {
+      var total = round(A*(1+n*r));
+      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
+      dock.difference.value = round(total - A).toLocaleString('vi', {style : 'currency', currency : 'VND'});
+    }
+    // Otherwise, the user's input was probably invalid, so don't
+    // display anything.
+    else {
+      dock.total.value = "";
+    }
+}
+
+function calculate_laikep() {
+    var dock = document.laikep;
+    var A = dock.A.value;
+    var r = dock.r.value / 100;
+    var n = dock.n.value;
+
+    // Check that the result is a finite number. If so, display the results.
+    if (!isNaN(r)) {
+      var total = round(A*Math.pow((1+r), n));
+      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
+      dock.difference.value = round(total - A).toLocaleString('vi', {style : 'currency', currency : 'VND'});
+    }
+    // Otherwise, the user's input was probably invalid, so don't
+    // display anything.
+    else {
+      dock.total.value = "";
+    }
+}
+
+function calculate_guihangthang() {
+    var dock = document.guihangthang;
+    var A = dock.A.value;
+    var r = dock.r.value / 100;
+    var n = dock.n.value;
+
+    // Check that the result is a finite number. If so, display the results.
+    if (!isNaN(r)) {
+      var total = round((A/r)*(Math.pow(1+r,n)-1)*(1+r));
+      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
+      dock.difference.value = round(total - A*n).toLocaleString('vi', {style : 'currency', currency : 'VND'});
+    }
+    // Otherwise, the user's input was probably invalid, so don't
+    // display anything.
+    else {
+      dock.total.value = "";
+    }
+}
+
+function calculate_guiruthangthang() {
+    var dock = document.guiruthangthang;
+    var A = dock.A.value;
+    var r = dock.r.value / 100;
+    var X = dock.X.value;
+    var n = dock.n.value;
+
+    // Check that the result is a finite number. If so, display the results.
+    if (!isNaN(r)) {
+      var total = round(A*Math.pow(1+r, n) - X*(Math.pow(1+r, n)-1)/r);
+      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
+      dock.difference.value = round(X*n).toLocaleString('vi', {style : 'currency', currency : 'VND'});
+    }
+    // Otherwise, the user's input was probably invalid, so don't
+    // display anything.
+    else {
+      dock.total.value = "";
+    }
+}
+
+function calculate_guiruthangthangall() {
+    var dock = document.guiruthangthangall;
+    var A = dock.A.value;
+    var r = dock.r.value / 100;
+    var X = dock.X.value;
+    var n = dock.n.value;
+
+    // Check that the result is a finite number. If so, display the results.
+    if (!isNaN(r)) {
+      var total = round(A*Math.pow(1+r, n)*r / (Math.pow(1+r, n)-1));
+      dock.X.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
+    }
+    // Otherwise, the user's input was probably invalid, so don't
+    // display anything.
+    else {
+      dock.X.value = "";
+    }
+}
+
+function calculate_vaytragop() {
+    var dock = document.vaytragop;
+    var A = dock.A.value;
+    var r = dock.r.value / 100;
+    var X = dock.X.value;
+
+    // Check that the result is a finite number. If so, display the results.
+    if (!isNaN(r)) {
+      dock.n.value = round((Math.log(X) - Math.log(X -A*r))/Math.log(1+r));
+    }
+    // Otherwise, the user's input was probably invalid, so don't
+    // display anything.
+    else {
+      dock.n.value = "";
+    }
+}
+
+// This simple method rounds a number to two decimal places.
+function round(x) {
+  return Math.round(x*100)/100;
+}
+</script>
+<button id="btn-dunogiamdan">Dư nợ giảm dần</button>
+<div class="pfs-loan-repayment">
+<div class="content-pfs-loan-repayment"><!-- content -->
+<table bgcolor="#fafafa" border="0" bordercolor="#e2e2e2" cellpadding="0" cellspacing="0" class="tbl-loan-repayment">
+	<tbody>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="left" width="20%">
+			<div class="text-loan-repayment">Số tiền vay</div>
+			</td>
+			<td align="left" width="80%"><input class="txt-loan-repayment" id="money" type="text" value="" tabindex="1"> VND</td>
+		</tr>
+		<tr>
+			<td align="left" width="20%">
+			<div class="text-loan-repayment">Thời gian vay</div>
+			</td>
+			<td align="left" width="80%"><input class="txt-loan-repayment" id="time" maxlength="3" type="text" value="" tabindex="2"> tháng</td>
+		</tr>
+		<tr>
+			<td align="left" width="20%">
+			<div class="text-loan-repayment">Lãi suất</div>
+			</td>
+			<td align="left" width="80%"><input class="txt-loan-repayment" id="percent" maxlength="4" type="text" value="" tabindex="3"> % năm</td>
+		</tr>
+		<tr>
+			<td align="left" width="20%">
+			<div class="text-loan-repayment">Ngày giải ngân</div>
+			</td>
+			<td align="left" width="80%"><input class="txt-date" id="date" readonly="readonly" type="text" value="" tabindex="4"> <img alt="Chọn ngày" id="btnDate" src="calendar-icon.gif"> <script type="text/javascript">//<![CDATA[
+                        Calendar.setup({
+                            inputField: "date",
+                            trigger: "btnDate",
+                            onSelect: function () { this.hide() },
+                            showTime: 8,
+                            dateFormat: " %m/%d/%Y"
+                        });
+                        //]]></script></td>
+		</tr>
+		<tr>
+			<td align="left" width="20%">&nbsp;</td>
+			<td align="left" width="80%"><input onclick="calcLoan();" type="button" value="TÍNH"></td>
+		</tr>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+
+<div id="listRepayment">&nbsp;</div>
+<!-- End content -->
+
+<div class="line-bar">&nbsp;</div>
+</div>
+</div>
+<button id="btn-laisuatcoban">Lãi suất cơ bản</button>
+<div id="div-laisuatcoban">
 <form name="laidon">
   <table>
     <tr><td colspan="3"><b>Lãi đơn</b></td></tr>
@@ -195,125 +528,7 @@
     </tr>
   </table>
 </form>
+</div>
 
-<script language="JavaScript">
-function calculate_laidon() {
-    var dock = document.laidon;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var n = dock.n.value;
-
-    // Check that the result is a finite number. If so, display the results.
-    if (!isNaN(r)) {
-      var total = round(A*(1+n*r));
-      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
-      dock.difference.value = round(total - A).toLocaleString('vi', {style : 'currency', currency : 'VND'});
-    }
-    // Otherwise, the user's input was probably invalid, so don't
-    // display anything.
-    else {
-      dock.total.value = "";
-    }
-}
-
-function calculate_laikep() {
-    var dock = document.laikep;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var n = dock.n.value;
-
-    // Check that the result is a finite number. If so, display the results.
-    if (!isNaN(r)) {
-      var total = round(A*Math.pow((1+r), n));
-      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
-      dock.difference.value = round(total - A).toLocaleString('vi', {style : 'currency', currency : 'VND'});
-    }
-    // Otherwise, the user's input was probably invalid, so don't
-    // display anything.
-    else {
-      dock.total.value = "";
-    }
-}
-
-function calculate_guihangthang() {
-    var dock = document.guihangthang;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var n = dock.n.value;
-
-    // Check that the result is a finite number. If so, display the results.
-    if (!isNaN(r)) {
-      var total = round((A/r)*(Math.pow(1+r,n)-1)*(1+r));
-      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
-      dock.difference.value = round(total - A*n).toLocaleString('vi', {style : 'currency', currency : 'VND'});
-    }
-    // Otherwise, the user's input was probably invalid, so don't
-    // display anything.
-    else {
-      dock.total.value = "";
-    }
-}
-
-function calculate_guiruthangthang() {
-    var dock = document.guiruthangthang;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var X = dock.X.value;
-    var n = dock.n.value;
-
-    // Check that the result is a finite number. If so, display the results.
-    if (!isNaN(r)) {
-      var total = round(A*Math.pow(1+r, n) - X*(Math.pow(1+r, n)-1)/r);
-      dock.total.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
-      dock.difference.value = round(X*n).toLocaleString('vi', {style : 'currency', currency : 'VND'});
-    }
-    // Otherwise, the user's input was probably invalid, so don't
-    // display anything.
-    else {
-      dock.total.value = "";
-    }
-}
-
-function calculate_guiruthangthangall() {
-    var dock = document.guiruthangthangall;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var X = dock.X.value;
-    var n = dock.n.value;
-
-    // Check that the result is a finite number. If so, display the results.
-    if (!isNaN(r)) {
-      var total = round(A*Math.pow(1+r, n)*r / (Math.pow(1+r, n)-1));
-      dock.X.value = total.toLocaleString('vi', {style : 'currency', currency : 'VND'});
-    }
-    // Otherwise, the user's input was probably invalid, so don't
-    // display anything.
-    else {
-      dock.X.value = "";
-    }
-}
-
-function calculate_vaytragop() {
-    var dock = document.vaytragop;
-    var A = dock.A.value;
-    var r = dock.r.value / 100;
-    var X = dock.X.value;
-
-    // Check that the result is a finite number. If so, display the results.
-    if (!isNaN(r)) {
-      dock.n.value = round((Math.log(X) - Math.log(X -A*r))/Math.log(1+r));
-    }
-    // Otherwise, the user's input was probably invalid, so don't
-    // display anything.
-    else {
-      dock.n.value = "";
-    }
-}
-
-// This simple method rounds a number to two decimal places.
-function round(x) {
-  return Math.round(x*100)/100;
-}
-</script>
 </body>
 </html>
