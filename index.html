@@ -4,6 +4,40 @@
 <script type="text/javascript" src="calendar.js"></script>
 <link href="pfs-loan-repayment-calculator.css" rel="stylesheet" type="text/css" />
 <link href="src/css/calendar.css" rel="stylesheet" type="text/css" />
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2; /* Header background color */
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9; /* Even row background color */
+        }
+
+        input, button {
+            margin: 10px;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body bgcolor="white">
 <script type="text/javascript">
@@ -15,6 +49,9 @@
   });
 	$("#btn-laisuatcoban").click(function(){
     $("#div-laisuatcoban").toggle();
+  });
+	$("#btn-tinhtiendien").click(function(){
+	$("#div-tinhtiendien").toggle();
   });
   
 			// thousand separator & number only
@@ -286,6 +323,75 @@ function calculate_vaytragop() {
 function round(x) {
   return Math.round(x*100)/100;
 }
+
+        function calculateElectricityBill(totalKWh) {
+            const pricingStructure = [
+                { range: 50, price: 1.806 },
+                { range: 50, price: 1.866 },
+                { range: 100, price: 2.167 },
+                { range: 100, price: 2.729 },
+                { range: 100, price: 3.050 },
+                { range: Infinity, price: 3.151 }
+            ];
+
+            let billAmount = 0;
+            const pricingDetails = [];
+
+            for (const [index, tier] of pricingStructure.entries()) {
+                const consumedInTier = Math.min(tier.range, totalKWh);
+                const subtotal = consumedInTier * tier.price;
+                billAmount += subtotal;
+
+                pricingDetails.push({
+                    range: `${index === pricingStructure.length - 1 ? '401 and above' : tier.range}`,
+                    price: tier.price,
+                    subtotal: subtotal.toFixed(2)
+                });
+
+                totalKWh -= consumedInTier;
+
+                if (totalKWh <= 0) {
+                    break;
+                }
+            }
+
+            const gtgtTax = 0.08 * billAmount;
+            const totalAmount = billAmount + gtgtTax;
+
+            return { billAmount: billAmount.toFixed(2), gtgtTax: gtgtTax.toFixed(2), totalAmount: totalAmount.toFixed(2), pricingDetails };
+        }
+
+        function calculateBill() {
+            const totalKWhInput = document.getElementById('totalKWh');
+            const resultDiv = document.getElementById('result');
+            const pricingTableBody = document.getElementById('pricingTableBody');
+            const subtotalAmountCell = document.getElementById('subtotalAmount');
+            const gtgtAmountCell = document.getElementById('gtgtAmount');
+            const totalAmountCell = document.getElementById('totalAmount');
+
+            const totalKWh = parseFloat(totalKWhInput.value);
+
+            if (isNaN(totalKWh) || totalKWh < 0) {
+                resultDiv.innerHTML = "<p>Please enter a valid non-negative number for total kWh.</p>";
+            } else {
+                const { billAmount, gtgtTax, totalAmount, pricingDetails } = calculateElectricityBill(totalKWh);
+
+                // Display the detailed pricing table
+                pricingTableBody.innerHTML = "";
+                pricingDetails.forEach(({ range, price, subtotal }, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${range}</td><td>${price}</td><td>${subtotal}</td>`;
+                    pricingTableBody.appendChild(row);
+                });
+
+                // Display the subtotal, GTGT, and total amount
+                subtotalAmountCell.textContent = `$${billAmount}`;
+                gtgtAmountCell.textContent = `$${gtgtTax}`;
+                totalAmountCell.textContent = `$${totalAmount}`;
+
+                resultDiv.innerHTML = `<p>For ${totalKWh} kWh, the electricity bill is $${totalAmount}</p>`;
+            }
+        }
 </script>
 <button id="btn-dunogiamdan">Dư nợ giảm dần</button>
 <div class="pfs-loan-repayment">
@@ -521,6 +627,78 @@ function round(x) {
     </tr>
   </table>
 </form>
+</div>
+
+<button id="btn-tinhtiendien">Tính tiền điện</button>
+<div id="div-tinhtiendien">
+
+    <h1>Electricity Bill Calculator</h1>
+
+    <table>
+        <tr>
+            <th>Total kWh</th>
+            <th>Price ($/kWh)</th>
+        </tr>
+        <tr>
+            <td>0 - 50</td>
+            <td>1.806</td>
+        </tr>
+        <tr>
+            <td>51 - 100</td>
+            <td>1.866</td>
+        </tr>
+        <tr>
+            <td>101 - 200</td>
+            <td>2.167</td>
+        </tr>
+        <tr>
+            <td>201 - 300</td>
+            <td>2.729</td>
+        </tr>
+        <tr>
+            <td>301 - 400</td>
+            <td>3.050</td>
+        </tr>
+        <tr>
+            <td>401 and above</td>
+            <td>3.151</td>
+        </tr>
+    </table>
+
+    <label for="totalKWh">Enter Total kWh:</label>
+    <input type="number" id="totalKWh" placeholder="Enter total kWh">
+
+    <button onclick="calculateBill()">Calculate Bill</button>
+
+    <div id="result"></div>
+
+    <h2>Pricing Tiers</h2>
+    <table>
+        <tr>
+            <th>Total kWh</th>
+            <th>Price ($/kWh)</th>
+            <th>Subtotal ($)</th>
+        </tr>
+        <tbody id="pricingTableBody"></tbody>
+        <tfoot>
+            <tr>
+                <td>Total</td>
+                <td></td>
+                <td id="subtotalAmount"></td>
+            </tr>
+            <tr>
+                <td>GTGT (8%)</td>
+                <td></td>
+                <td id="gtgtAmount"></td>
+            </tr>
+            <tr>
+                <td>Total Amount</td>
+                <td></td>
+                <td id="totalAmount"></td>
+            </tr>
+        </tfoot>
+    </table>
+	
 </div>
 
 </body>
