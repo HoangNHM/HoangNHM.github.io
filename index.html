@@ -336,6 +336,7 @@ function round(x) {
 
             let billAmount = 0;
             const pricingDetails = [];
+            const consumedDetails = [];
 
             for (const [index, tier] of pricingStructure.entries()) {
                 const consumedInTier = Math.min(tier.range, totalKWh);
@@ -343,7 +344,14 @@ function round(x) {
                 billAmount += subtotal;
 
                 pricingDetails.push({
+                    consumed: consumedInTier.toFixed(2),
                     range: `${index === pricingStructure.length - 1 ? '401 and above' : tier.range}`,
+                    price: tier.price,
+                    subtotal: subtotal.toFixed(2)
+                });
+
+                consumedDetails.push({
+                    consumed: consumedInTier.toFixed(2),
                     price: tier.price,
                     subtotal: subtotal.toFixed(2)
                 });
@@ -358,38 +366,35 @@ function round(x) {
             const gtgtTax = 0.08 * billAmount;
             const totalAmount = billAmount + gtgtTax;
 
-            return { billAmount: billAmount.toFixed(2), gtgtTax: gtgtTax.toFixed(2), totalAmount: totalAmount.toFixed(2), pricingDetails };
+            return { consumedDetails, billAmount:billAmount.toFixed(2), gtgtTax: gtgtTax.toFixed(2), totalAmount: totalAmount.toFixed(2), pricingDetails };
         }
 
         function calculateBill() {
             const totalKWhInput = document.getElementById('totalKWh');
-            const resultDiv = document.getElementById('result');
             const pricingTableBody = document.getElementById('pricingTableBody');
-            const subtotalAmountCell = document.getElementById('subtotalAmount');
+            const pricingTotalAmountCell = document.getElementById('pricingTotalAmount');
             const gtgtAmountCell = document.getElementById('gtgtAmount');
             const totalAmountCell = document.getElementById('totalAmount');
 
             const totalKWh = parseFloat(totalKWhInput.value);
 
             if (isNaN(totalKWh) || totalKWh < 0) {
-                resultDiv.innerHTML = "<p>Please enter a valid non-negative number for total kWh.</p>";
+                alert("Please enter a valid non-negative number for total kWh.");
             } else {
-                const { billAmount, gtgtTax, totalAmount, pricingDetails } = calculateElectricityBill(totalKWh);
+                const { consumedDetails, billAmount, gtgtTax, totalAmount, pricingDetails } = calculateElectricityBill(totalKWh);
 
-                // Display the detailed pricing table
+                // Display the pricing tiers table
                 pricingTableBody.innerHTML = "";
-                pricingDetails.forEach(({ range, price, subtotal }, index) => {
+                pricingDetails.forEach(({ consumed, billAmount, range, price, subtotal }) => {
                     const row = document.createElement('tr');
-                    row.innerHTML = `<td>${range}</td><td>${price}</td><td>${subtotal}</td>`;
+                    row.innerHTML = `<td>${range}</td><td>${price}</td><td>${consumed}</td><td>${subtotal}</td>`;
                     pricingTableBody.appendChild(row);
                 });
 
-                // Display the subtotal, GTGT, and total amount
-                subtotalAmountCell.textContent = `$${billAmount}`;
+                // Display the totals
+                pricingTotalAmountCell.textContent = `$${billAmount}`;
                 gtgtAmountCell.textContent = `$${gtgtTax}`;
                 totalAmountCell.textContent = `$${totalAmount}`;
-
-                resultDiv.innerHTML = `<p>For ${totalKWh} kWh, the electricity bill is $${totalAmount}</p>`;
             }
         }
 </script>
@@ -670,13 +675,12 @@ function round(x) {
 
     <button onclick="calculateBill()">Calculate Bill</button>
 
-    <div id="result"></div>
-
     <h2>Pricing Tiers</h2>
     <table>
         <tr>
-            <th>Total kWh</th>
+            <th>Tiers</th>
             <th>Price ($/kWh)</th>
+            <th>Consumed kWh</th>
             <th>Subtotal ($)</th>
         </tr>
         <tbody id="pricingTableBody"></tbody>
@@ -684,15 +688,18 @@ function round(x) {
             <tr>
                 <td>Total</td>
                 <td></td>
-                <td id="subtotalAmount"></td>
+                <td></td>
+                <td id="pricingTotalAmount"></td>
             </tr>
             <tr>
                 <td>GTGT (8%)</td>
+                <td></td>
                 <td></td>
                 <td id="gtgtAmount"></td>
             </tr>
             <tr>
                 <td>Total Amount</td>
+                <td></td>
                 <td></td>
                 <td id="totalAmount"></td>
             </tr>
